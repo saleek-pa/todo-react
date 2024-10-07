@@ -2,12 +2,14 @@ import { Button, Modal } from 'flowbite-react';
 import { useContext } from 'react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { TodoContext } from './Context';
+import toast from 'react-hot-toast';
 
 export function DeleteModal({ todoId, openModal, setOpenModal }) {
   const { deleteTodo } = useContext(TodoContext);
 
   const handleDelete = () => {
     deleteTodo(todoId);
+    toast.error('Task deleted successfully.');
     setOpenModal(false);
   };
 

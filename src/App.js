@@ -1,10 +1,12 @@
 import Todo from './components/Todo';
 import './App.css';
 import { TodoProvider } from './components/Context';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <TodoProvider>
+      <Toaster position="bottom-right" reverseOrder={false} />
       <Todo />
     </TodoProvider>
   );
