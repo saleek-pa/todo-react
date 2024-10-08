@@ -1,16 +1,16 @@
 import React, { useContext, useState } from 'react';
 import { ImCheckboxChecked, ImCheckboxUnchecked } from 'react-icons/im';
 import { RiArrowDropDownLine } from 'react-icons/ri';
-import { TodoContext } from './Context';
+import { TodoContext } from '../context/Context';
 
 const CustomDropdown = () => {
-  const { todos, filterTodo, selectedPriorities, setSelectedPriorities } = useContext(TodoContext);
+  const { selectedPriorities, setSelectedPriorities, refetchTodos } = useContext(TodoContext);
   const [isOpen, setIsOpen] = useState(false);
 
   const options = [
-    { value: '1', label: 'Priority 1' },
-    { value: '2', label: 'Priority 2' },
-    { value: '3', label: 'Priority 3' },
+    { value: 1, label: 'Priority 1' },
+    { value: 2, label: 'Priority 2' },
+    { value: 3, label: 'Priority 3' },
   ];
 
   const handleFilterByPriority = (value) => {
@@ -19,16 +19,16 @@ const CustomDropdown = () => {
       : [...selectedPriorities, value];
 
     setSelectedPriorities(updatedSelection);
-    filterTodo(todos, updatedSelection);
+    refetchTodos();
   };
 
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex  justify-center content-center w-40 bg-white border border-gray-300 rounded-md p-2 text-left focus:outline-none"
+        className="flex justify-center items-center gap-1.5 w-28 bg-white border border-gray-300 rounded-md py-2.5 text-left focus:outline-none"
       >
-        Filter by Priority
+        Filter
         <RiArrowDropDownLine className="text-2xl" />
       </button>
       {isOpen && (

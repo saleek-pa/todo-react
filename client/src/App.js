@@ -1,6 +1,6 @@
 import Todo from './components/Todo';
 import './App.css';
-import { TodoProvider } from './components/Context';
+import { TodoProvider } from './context/Context';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
