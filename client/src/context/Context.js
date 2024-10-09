@@ -65,6 +65,42 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
+  const addSubTask = async (todoId, title) => {
+    try {
+      await makePostRequest(`/todos/${todoId}/subtasks`, { title });
+      refetchTodos();
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
+  };
+
+  const updateSubTask = async (todoId, subTaskId, title) => {
+    try {
+      await makePutRequest(`/todos/${todoId}/subtasks/${subTaskId}`, { title });
+      refetchTodos();
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
+  };
+
+  const toggleSubtask = async (todoId, subTaskId) => {
+    try {
+      await makePatchRequest(`/todos/${todoId}/subtasks/${subTaskId}`);
+      refetchTodos();
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  };
+
+  const deleteSubtask = async (todoId, subTaskId) => {
+    try {
+      await makeDeleteRequest(`/todos/${todoId}/subtasks/${subTaskId}`);
+      refetchTodos();
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  };
+
   const value = {
     todos,
     selectedPriorities,
@@ -78,6 +114,10 @@ export const TodoProvider = ({ children }) => {
     refetchTodos,
     openCreateInput,
     setOpenCreateInput,
+    addSubTask,
+    updateSubTask,
+    toggleSubtask,
+    deleteSubtask,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

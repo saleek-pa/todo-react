@@ -26,6 +26,12 @@ const todoSchema = new mongoose.Schema(
       enum: ['pending', 'completed'],
       default: 'pending',
     },
+    subTasks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'SubTask',
+      },
+    ],
   },
   {
     timestamps: true,

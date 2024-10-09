@@ -9,7 +9,8 @@ const Axios = AXIOS.create({
 
 const makeApiRequest = async (method, url, data = {}) => {
   try {
-    return await Axios({ method, url, data });
+    const response = await Axios({ method, url, data });
+    return response;
   } catch (err) {
     return err;
   }

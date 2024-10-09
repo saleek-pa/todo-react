@@ -10,6 +10,24 @@ const getAllTodos = async (req, res) => {
 
   const [result] = await Todo.aggregate([
     { $match: filterConditions },
+    {
+      $lookup: {
+        from: 'subtasks',
+        localField: 'subTasks',
+        foreignField: '_id',
+        as: 'subTasks',
+      },
+    },
+    {
+      $addFields: {
+        subTasks: {
+          $sortArray: {
+            input: '$subTasks',
+            sortBy: { createdAt: 1 },
+          },
+        },
+      },
+    },
     { $sort: { createdAt: -1 } },
     {
       $facet: {
@@ -37,9 +55,9 @@ const createTodo = async (req, res) => {
 };
 
 const updateTodo = async (req, res) => {
-  const { id } = req.params;
+  const { todoId } = req.params;
   const todo = req.body;
-  const updatedTodo = await Todo.findByIdAndUpdate(id, todo, { new: true });
+  const updatedTodo = await Todo.findByIdAndUpdate(todoId, todo, { new: true });
   if (!updatedTodo) {
     return res.status(404).json({
       status: 'failure',
@@ -55,8 +73,8 @@ const updateTodo = async (req, res) => {
 };
 
 const toggleStatusTodo = async (req, res) => {
-  const { id } = req.params;
-  const todo = await Todo.findById(id);
+  const { todoId } = req.params;
+  const todo = await Todo.findById(todoId);
   if (!todo) {
     return res.status(404).json({
       status: 'failure',
@@ -65,7 +83,7 @@ const toggleStatusTodo = async (req, res) => {
   }
 
   const updatedTodo = await Todo.findByIdAndUpdate(
-    id,
+    todoId,
     { status: todo.status === 'completed' ? 'pending' : 'completed' },
     { new: true }
   );
@@ -78,8 +96,8 @@ const toggleStatusTodo = async (req, res) => {
 };
 
 const deleteTodo = async (req, res) => {
-  const { id } = req.params;
-  const deletedTodo = await Todo.findByIdAndDelete(id);
+  const { todoId } = req.params;
+  const deletedTodo = await Todo.findByIdAndDelete(todoId);
   if (!deletedTodo) {
     return res.status(404).json({
       status: 'failure',

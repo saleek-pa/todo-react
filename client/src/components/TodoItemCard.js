@@ -1,16 +1,21 @@
 import { useState, useContext } from 'react';
 import { TodoContext } from '../context/Context';
-import { MdOutlineCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
+import {
+  MdAccessTimeFilled,
+  MdOutlineCheckBox,
+  MdOutlineCheckBoxOutlineBlank,
+} from 'react-icons/md';
 import { Datepicker, Select, TextInput } from 'flowbite-react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FiCheckSquare } from 'react-icons/fi';
 import { HiOutlinePlus } from 'react-icons/hi';
 import { BsXSquare } from 'react-icons/bs';
 import { FaRegEdit } from 'react-icons/fa';
-import toast from 'react-hot-toast';
 import CreateSubTaskInput from './CreateSubTaskInput';
+import SubtaskItemCard from './SubtaskItemCard';
+import toast from 'react-hot-toast';
 
-const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenDeleteModal }) => {
+const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTodoDeleteModal }) => {
   const { toggleTodo, updateTodo, setOpenCreateInput } = useContext(TodoContext);
   const [createSubTaskInput, setCreateSubTaskInput] = useState(false);
 
@@ -25,6 +30,7 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenDel
     toast.success('Task updated successfully.');
   };
 
+  const todoDate = new Date(todo.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
   const today = new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
   const yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toLocaleDateString();
   const tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toLocaleDateString();
@@ -88,19 +94,7 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenDel
                     />
                     <div className="relative">
                       <div className="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
-                        <svg
-                          className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <MdAccessTimeFilled className="text-gray-500" />
                       </div>
                       <input
                         type="time"
@@ -166,21 +160,13 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenDel
                       P{todo.priority}
                     </span>
                     <p className="text-sm text-gray-500">
-                      {new Date(todo.date).toLocaleDateString('en-US', {
-                        timeZone: 'Asia/Kolkata',
-                      }) === today
+                      {todoDate === today
                         ? 'Today'
-                        : new Date(todo.date).toLocaleDateString('en-US', {
-                            timeZone: 'Asia/Kolkata',
-                          }) === yesterday
+                        : todoDate === yesterday
                         ? 'Yesterday'
-                        : new Date(todo.date).toLocaleDateString('en-US', {
-                            timeZone: 'Asia/Kolkata',
-                          }) === tomorrow
+                        : todoDate === tomorrow
                         ? 'Tomorrow'
-                        : new Date(todo.date).toLocaleDateString('en-US', {
-                            timeZone: 'Asia/Kolkata',
-                          })}{' '}
+                        : todoDate}{' '}
                       - {convert24HourTo12Hour(todo.time)}
                     </p>
                   </div>
@@ -205,7 +191,7 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenDel
                 <RiDeleteBin6Line
                   onClick={() => {
                     setTodoToDelete(todo);
-                    setOpenDeleteModal(true);
+                    setOpenTodoDeleteModal(true);
                   }}
                   className="text-2xl text-gray-500 cursor-pointer transition-all hover:text-red-400"
                 />
@@ -213,10 +199,18 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenDel
             </>
           )}
         </div>
+
+        {todo.subTasks.map((subTask) => (
+          <SubtaskItemCard
+            key={subTask._id}
+            todoId={todo._id}
+            subTask={subTask}
+            setCreateSubTaskInput={setCreateSubTaskInput}
+          />
+        ))}
+
         {createSubTaskInput && (
-          <div>
-            <CreateSubTaskInput />
-          </div>
+          <CreateSubTaskInput todoId={todo._id} setCreateSubTaskInput={setCreateSubTaskInput} />
         )}
       </div>
     </div>

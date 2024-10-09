@@ -12,7 +12,7 @@ const TodoList = () => {
     useContext(TodoContext);
   const [todoToEdit, setTodoToEdit] = useState({});
   const [todoToDelete, setTodoToDelete] = useState({});
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openTodoDeleteModal, setOpenTodoDeleteModal] = useState(false);
 
   return (
     <div className="max-w-3xl mx-auto p-6 my-8">
@@ -45,7 +45,7 @@ const TodoList = () => {
               <TodoItem
                 key={todo._id}
                 todo={todo}
-                setOpenDeleteModal={setOpenDeleteModal}
+                setOpenTodoDeleteModal={setOpenTodoDeleteModal}
                 todoToEdit={todoToEdit}
                 setTodoToEdit={setTodoToEdit}
                 setTodoToDelete={setTodoToDelete}
@@ -61,7 +61,7 @@ const TodoList = () => {
                   <TodoItem
                     key={todo._id}
                     todo={todo}
-                    setOpenDeleteModal={setOpenDeleteModal}
+                    setOpenTodoDeleteModal={setOpenTodoDeleteModal}
                     todoToEdit={todoToEdit}
                     setTodoToEdit={setTodoToEdit}
                     setTodoToDelete={setTodoToDelete}
@@ -73,11 +73,11 @@ const TodoList = () => {
         </>
       )}
 
-      {openDeleteModal && (
+      {openTodoDeleteModal && (
         <DeleteModal
           todoToDelete={todoToDelete}
-          openModal={openDeleteModal}
-          setOpenModal={setOpenDeleteModal}
+          openModal={openTodoDeleteModal}
+          setOpenModal={setOpenTodoDeleteModal}
         />
       )}
     </div>

@@ -11,8 +11,8 @@ const router = express.Router();
 
 router.get('/todos', tryCatch(getAllTodos));
 router.post('/todos', tryCatch(createTodo));
-router.put('/todos/:id', tryCatch(updateTodo));
-router.patch('/todos/:id', tryCatch(toggleStatusTodo));
-router.delete('/todos/:id', tryCatch(deleteTodo));
+router.put('/todos/:todoId', tryCatch(updateTodo));
+router.patch('/todos/:todoId', tryCatch(toggleStatusTodo));
+router.delete('/todos/:todoId', tryCatch(deleteTodo));
 
 module.exports = router;

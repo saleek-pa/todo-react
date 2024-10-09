@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const todoRoutes = require('./routes/todoRoutes');
+const subTaskRoutes = require('./routes/subTaskRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 require('dotenv').config();
 
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api', todoRoutes);
+app.use('/api', subTaskRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
