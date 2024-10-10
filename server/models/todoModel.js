@@ -26,6 +26,10 @@ const todoSchema = new mongoose.Schema(
       enum: ['pending', 'completed'],
       default: 'pending',
     },
+    order: {
+      type: Number,
+      required: true,
+    },
     subTasks: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -101,23 +101,40 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
+  const reorderTodos = async (source, destination) => {
+    try {
+      const [removed] = todos.pendingTodos.splice(source.index, 1);
+      todos.pendingTodos.splice(destination.index, 0, removed);
+
+      const updatedTodos = todos.pendingTodos.concat(todos.completedTodos);
+      const reorderedTodos = updatedTodos.map((todo, index) => ({
+        _id: todo._id,
+        order: index + 1,
+      }));
+      await makePutRequest(`/todos/reorder`, { reorderedTodos });
+    } catch (error) {
+      console.error('Error reordering task:', error);
+    }
+  };
+
   const value = {
     todos,
-    selectedPriorities,
-    setSelectedPriorities,
     addTodo,
     updateTodo,
-    deleteTodo,
     toggleTodo,
+    deleteTodo,
+    refetchTodos,
+    selectedPriorities,
+    setSelectedPriorities,
     searchTerm,
     setSearchTerm,
-    refetchTodos,
     openCreateInput,
     setOpenCreateInput,
     addSubTask,
     updateSubTask,
     toggleSubtask,
     deleteSubtask,
+    reorderTodos,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

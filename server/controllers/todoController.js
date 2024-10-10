@@ -1,15 +1,29 @@
+const SubTask = require('../models/subTaskModel');
 const Todo = require('../models/todoModel');
 
 const getAllTodos = async (req, res) => {
   const { priorities, searchTerm } = req.query;
 
-  const filterConditions = {
-    ...(priorities && { priority: { $in: priorities.split(',').map(Number) } }),
-    ...(searchTerm && { title: { $regex: new RegExp(searchTerm, 'i') } }),
-  };
+  let filterConditions = {};
+  if (priorities) {
+    filterConditions.priority = { $in: priorities.split(',').map(Number) };
+  }
+  if (searchTerm) {
+    filterConditions.$or = [
+      {
+        title: {
+          $regex: new RegExp(searchTerm, 'i'),
+        },
+      },
+      {
+        'subTasks.title': {
+          $regex: new RegExp(searchTerm, 'i'),
+        },
+      },
+    ];
+  }
 
   const [result] = await Todo.aggregate([
-    { $match: filterConditions },
     {
       $lookup: {
         from: 'subtasks',
@@ -28,7 +42,12 @@ const getAllTodos = async (req, res) => {
         },
       },
     },
-    { $sort: { createdAt: -1 } },
+    {
+      $match: filterConditions,
+    },
+    {
+      $sort: { order: 1 },
+    },
     {
       $facet: {
         pendingTodos: [{ $match: { status: 'pending' } }],
@@ -45,8 +64,18 @@ const getAllTodos = async (req, res) => {
 };
 
 const createTodo = async (req, res) => {
-  const todo = req.body;
-  const newTodo = await Todo.create(todo);
+  const todoData = req.body;
+
+  // const maxOrderTodo = await Todo.findOne().sort({ order: -1 });
+  // const newOrder = maxOrderTodo ? maxOrderTodo.order + 1 : 1;
+  const minOrderTodo = await Todo.findOne().sort({ order: 1 });
+  const newOrder = minOrderTodo ? minOrderTodo.order - 1 : 1;
+
+  const newTodo = await Todo.create({
+    ...todoData,
+    order: newOrder,
+  });
+
   return res.status(201).json({
     status: 'success',
     message: 'Todo created successfully',
@@ -105,10 +134,30 @@ const deleteTodo = async (req, res) => {
     });
   }
 
+  await SubTask.deleteMany({ _id: { $in: deletedTodo.subTasks } });
+
   return res.status(200).json({
     status: 'success',
     message: 'Todo deleted successfully',
     data: deletedTodo,
+  });
+};
+
+const reorderTodos = async (req, res) => {
+  const { reorderedTodos } = req.body;
+
+  const bulkUpdates = reorderedTodos.map((todo) => ({
+    updateOne: {
+      filter: { _id: todo._id },
+      update: { order: todo.order },
+    },
+  }));
+
+  await Todo.bulkWrite(bulkUpdates);
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Todos reordered successfully',
   });
 };
 
@@ -118,4 +167,5 @@ module.exports = {
   updateTodo,
   toggleStatusTodo,
   deleteTodo,
+  reorderTodos,
 };
