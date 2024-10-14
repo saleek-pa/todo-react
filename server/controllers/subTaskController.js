@@ -5,24 +5,25 @@ const addSubtask = async (req, res) => {
   const { todoId } = req.params;
   const { title } = req.body;
 
-  const newSubTask = await SubTask.create({ title });
-  const updatedTodo = await Todo.findByIdAndUpdate(
-    todoId,
-    { $push: { subTasks: newSubTask._id } },
-    { new: true }
-  );
-
-  if (!updatedTodo) {
+  const todo = await Todo.findById(todoId).populate('subTasks');
+  if (!todo) {
     return res.status(404).json({
       status: 'failure',
       message: 'Todo not found',
     });
   }
 
+  const currentSubTasksCount = todo.subTasks.length;
+  const newOrder = currentSubTasksCount + 1;
+
+  const newSubTask = await SubTask.create({ title, order: newOrder });
+  todo.subTasks.push(newSubTask._id);
+  await todo.save();
+
   return res.status(201).json({
     status: 'success',
     message: 'Subtask added successfully',
-    data: updatedTodo,
+    data: todo,
   });
 };
 
@@ -95,4 +96,22 @@ const deleteSubtask = async (req, res) => {
   });
 };
 
-module.exports = { addSubtask, updateSubTask, toggleSubtask, deleteSubtask };
+const reorderSubtask = async (req, res) => {
+  const { reorderedSubtasks } = req.body;
+
+  const bulkUpdates = reorderedSubtasks.map((subTask) => ({
+    updateOne: {
+      filter: { _id: subTask._id },
+      update: { order: subTask.order },
+    },
+  }));
+
+  await SubTask.bulkWrite(bulkUpdates);
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Todos reordered successfully',
+  });
+};
+
+module.exports = { addSubtask, updateSubTask, toggleSubtask, deleteSubtask, reorderSubtask };

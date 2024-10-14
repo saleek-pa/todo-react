@@ -7,19 +7,14 @@ import CustomDropdown from './Dropdown';
 import TodoItem from './TodoItemCard';
 import SearchBar from './SearchBar';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import DragHandle from './DragHandle';
 
 const TodoList = () => {
-  const { todos, selectedPriorities, openCreateInput, setOpenCreateInput, reorderTodos } =
+  const { todos, selectedPriorities, openCreateInput, setOpenCreateInput, handleOnDragEnd } =
     useContext(TodoContext);
   const [todoToEdit, setTodoToEdit] = useState({});
   const [todoToDelete, setTodoToDelete] = useState({});
   const [openTodoDeleteModal, setOpenTodoDeleteModal] = useState(false);
-
-  const handleOnDragEnd = (result) => {
-    const { source, destination } = result;
-    if (!destination) return;
-    reorderTodos(source, destination);
-  };
 
   return (
     <div className="max-w-3xl mx-auto p-6 my-8">
@@ -50,17 +45,17 @@ const TodoList = () => {
           <DragDropContext onDragEnd={handleOnDragEnd}>
             <Droppable droppableId="pendingTodos">
               {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} className="mb-8">
+                <div {...provided.droppableProps} ref={provided.innerRef}>
                   {todos?.pendingTodos.map((todo, index) => (
-                    <Draggable key={todo._id} draggableId={todo._id} index={index}>
+                    <Draggable key={todo._id} index={index} draggableId={todo._id}>
                       {(provided) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          {...provided.dragHandleProps}
+                          className="flex justify-center"
                         >
+                          <DragHandle {...provided.dragHandleProps} className="py-3 mb-4" />
                           <TodoItem
-                            key={todo._id}
                             todo={todo}
                             setOpenTodoDeleteModal={setOpenTodoDeleteModal}
                             todoToEdit={todoToEdit}

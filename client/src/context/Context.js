@@ -65,6 +65,22 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
+  const reorderTodos = async (source, destination) => {
+    try {
+      const [removed] = todos.pendingTodos.splice(source.index, 1);
+      todos.pendingTodos.splice(destination.index, 0, removed);
+
+      const updatedTodos = todos.pendingTodos.concat(todos.completedTodos);
+      const reorderedTodos = updatedTodos.map((todo, index) => ({
+        _id: todo._id,
+        order: index + 1,
+      }));
+      await makePutRequest(`/todos/reorder`, { reorderedTodos });
+    } catch (error) {
+      console.error('Error reordering task:', error);
+    }
+  };
+
   const addSubTask = async (todoId, title) => {
     try {
       await makePostRequest(`/todos/${todoId}/subtasks`, { title });
@@ -101,19 +117,29 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
-  const reorderTodos = async (source, destination) => {
+  const reorderSubtask = async (todo, source, destination) => {
     try {
-      const [removed] = todos.pendingTodos.splice(source.index, 1);
-      todos.pendingTodos.splice(destination.index, 0, removed);
+      const [removed] = todo.subTasks.splice(source.index, 1);
+      todo.subTasks.splice(destination.index, 0, removed);
 
-      const updatedTodos = todos.pendingTodos.concat(todos.completedTodos);
-      const reorderedTodos = updatedTodos.map((todo, index) => ({
-        _id: todo._id,
+      const reorderedSubtasks = todo.subTasks.map((subTask, index) => ({
+        _id: subTask._id,
         order: index + 1,
       }));
-      await makePutRequest(`/todos/reorder`, { reorderedTodos });
+      await makePutRequest(`/todos/${todo._id}/subtasks/reorder`, { reorderedSubtasks });
     } catch (error) {
       console.error('Error reordering task:', error);
+    }
+  };
+
+  const handleOnDragEnd = (result, todo = {}) => {
+    const { source, destination } = result;
+    if (!destination) return;
+    if (source.droppableId === 'pendingTodos') {
+      reorderTodos(source, destination);
+    }
+    if (source.droppableId === 'subTasks') {
+      reorderSubtask(todo, source, destination);
     }
   };
 
@@ -135,6 +161,8 @@ export const TodoProvider = ({ children }) => {
     toggleSubtask,
     deleteSubtask,
     reorderTodos,
+    reorderSubtask,
+    handleOnDragEnd,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

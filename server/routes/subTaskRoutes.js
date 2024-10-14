@@ -5,10 +5,12 @@ const {
   updateSubTask,
   toggleSubtask,
   deleteSubtask,
+  reorderSubtask,
 } = require('../controllers/subTaskController');
 const router = express.Router();
 
 router.post('/todos/:todoId/subtasks', tryCatch(addSubtask));
+router.put('/todos/:todoId/subtasks/reorder', tryCatch(reorderSubtask));
 router.put('/todos/:todoId/subtasks/:subtaskId', tryCatch(updateSubTask));
 router.patch('/todos/:todoId/subtasks/:subtaskId', tryCatch(toggleSubtask));
 router.delete('/todos/:todoId/subtasks/:subtaskId', tryCatch(deleteSubtask));

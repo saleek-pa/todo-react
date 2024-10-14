@@ -37,7 +37,7 @@ const getAllTodos = async (req, res) => {
         subTasks: {
           $sortArray: {
             input: '$subTasks',
-            sortBy: { createdAt: 1 },
+            sortBy: { order: 1 },
           },
         },
       },
@@ -66,8 +66,6 @@ const getAllTodos = async (req, res) => {
 const createTodo = async (req, res) => {
   const todoData = req.body;
 
-  // const maxOrderTodo = await Todo.findOne().sort({ order: -1 });
-  // const newOrder = maxOrderTodo ? maxOrderTodo.order + 1 : 1;
   const minOrderTodo = await Todo.findOne().sort({ order: 1 });
   const newOrder = minOrderTodo ? minOrderTodo.order - 1 : 1;
 

@@ -17,7 +17,7 @@ const SubtaskItemCard = ({ subTask, todoId, setCreateSubTaskInput }) => {
   const [openSubtaskDeleteModal, setOpenSubtaskDeleteModal] = useState(false);
 
   return (
-    <div className="flex justify-between px-5 border rounded-md py-2 mt-3">
+    <div className="flex flex-1 justify-between px-5 border rounded-md py-2 mt-3">
       {subTaskToEdit._id === subTask._id ? (
         <>
           <div className="flex flex-1 items-center justify-between py-3 gap-16">

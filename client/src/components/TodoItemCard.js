@@ -6,6 +6,7 @@ import {
   MdOutlineCheckBoxOutlineBlank,
 } from 'react-icons/md';
 import { Datepicker, Select, TextInput } from 'flowbite-react';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FiCheckSquare } from 'react-icons/fi';
 import { HiOutlinePlus } from 'react-icons/hi';
@@ -13,10 +14,11 @@ import { BsXSquare } from 'react-icons/bs';
 import { FaRegEdit } from 'react-icons/fa';
 import CreateSubTaskInput from './CreateSubTaskInput';
 import SubtaskItemCard from './SubtaskItemCard';
+import DragHandle from './DragHandle';
 import toast from 'react-hot-toast';
 
 const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTodoDeleteModal }) => {
-  const { toggleTodo, updateTodo, setOpenCreateInput } = useContext(TodoContext);
+  const { toggleTodo, updateTodo, setOpenCreateInput, handleOnDragEnd } = useContext(TodoContext);
   const [createSubTaskInput, setCreateSubTaskInput] = useState(false);
 
   const handleEditClick = (todo) => {
@@ -49,7 +51,7 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTod
   };
 
   return (
-    <div className="mb-4 border rounded-md transition-all hover:bg-gray-100  py-3 px-5">
+    <div className="flex-1 mb-4 border rounded-md transition-all hover:bg-gray-100 py-3 px-5">
       <div className="flex flex-col">
         <div className="flex justify-between items-center">
           {todoToEdit._id === todo._id ? (
@@ -200,14 +202,33 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTod
           )}
         </div>
 
-        {todo.subTasks.map((subTask) => (
-          <SubtaskItemCard
-            key={subTask._id}
-            todoId={todo._id}
-            subTask={subTask}
-            setCreateSubTaskInput={setCreateSubTaskInput}
-          />
-        ))}
+        <DragDropContext onDragEnd={(result) => handleOnDragEnd(result, todo)}>
+          <Droppable droppableId="subTasks">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {todo.subTasks?.map((subTask, index) => (
+                  <Draggable key={subTask._id} draggableId={subTask._id} index={index}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="flex justify-center items-center"
+                      >
+                        <DragHandle {...provided.dragHandleProps} className="mt-3" />
+                        <SubtaskItemCard
+                          todoId={todo._id}
+                          subTask={subTask}
+                          setCreateSubTaskInput={setCreateSubTaskInput}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
         {createSubTaskInput && (
           <CreateSubTaskInput todoId={todo._id} setCreateSubTaskInput={setCreateSubTaskInput} />
