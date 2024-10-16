@@ -1,12 +1,18 @@
 const mongoose = require('mongoose');
-const SubTask = require('../models/subTaskModel');
+const User = require('../models/userModel');
 const Todo = require('../models/todoModel');
+const SubTask = require('../models/subTaskModel');
 
 const getAllTodos = async (req, res) => {
   const { priorities, searchTerm } = req.query;
   const { userId } = req.user;
 
-  let filterConditions = { userId: new mongoose.Types.ObjectId(userId) };
+  let filterConditions = {
+    $or: [
+      { userId: new mongoose.Types.ObjectId(userId) },
+      { assigneeIds: new mongoose.Types.ObjectId(userId) },
+    ],
+  };
 
   if (priorities) {
     filterConditions.priority = { $in: priorities.split(',').map(Number) };
@@ -38,6 +44,43 @@ const getAllTodos = async (req, res) => {
         foreignField: '_id',
         as: 'subTasks',
       },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'assigneeIds',
+        foreignField: '_id',
+        as: 'assignees',
+        pipeline: [
+          {
+            $project: {
+              name: 1,
+              email: 1,
+              image: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'createdUser',
+        pipeline: [
+          {
+            $project: {
+              name: 1,
+              email: 1,
+              image: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: '$createdUser',
     },
     {
       $addFields: {
@@ -165,6 +208,30 @@ const reorderTodos = async (req, res) => {
   });
 };
 
+const assignTodoToUser = async (req, res) => {
+  const { selectedUsers } = req.body;
+  const { todoId } = req.params;
+
+  const updatedTask = await Todo.findByIdAndUpdate(
+    todoId,
+    { $set: { assigneeIds: selectedUsers } },
+    { new: true }
+  );
+
+  if (!updatedTask) {
+    return res.status(404).json({
+      status: 'failure',
+      message: 'Todo not found',
+    });
+  }
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Todo assigned successfully',
+    data: updatedTask,
+  });
+};
+
 module.exports = {
   getAllTodos,
   createTodo,
@@ -172,4 +239,5 @@ module.exports = {
   toggleStatusTodo,
   deleteTodo,
   reorderTodos,
+  assignTodoToUser,
 };

@@ -1,7 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const path = require('path');
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -44,6 +43,7 @@ const login = async (req, res) => {
     data: {
       token,
       user: {
+        id: user._id,
         name: user.name,
         email: user.email,
         image: user.image,
@@ -52,4 +52,15 @@ const login = async (req, res) => {
   });
 };
 
-module.exports = { register, login };
+const getAllUsers = async (req, res) => {
+  const { userId } = req.user;
+  const users = await User.find({ _id: { $ne: userId } }, 'name email image');
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Users retrieved successfully',
+    data: users,
+  });
+};
+
+module.exports = { register, login, getAllUsers };

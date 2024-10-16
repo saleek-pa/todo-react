@@ -7,6 +7,7 @@ const {
   reorderTodos,
   toggleStatusTodo,
   deleteTodo,
+  assignTodoToUser,
 } = require('../controllers/todoController');
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router
   .put('/reorder', tryCatch(reorderTodos))
   .put('/:todoId', tryCatch(updateTodo))
   .patch('/:todoId', tryCatch(toggleStatusTodo))
-  .delete('/:todoId', tryCatch(deleteTodo));
+  .delete('/:todoId', tryCatch(deleteTodo))
+  .post('/:todoId/assign', tryCatch(assignTodoToUser));
 
 module.exports = router;

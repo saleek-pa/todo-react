@@ -5,21 +5,24 @@ import {
   MdOutlineCheckBox,
   MdOutlineCheckBoxOutlineBlank,
 } from 'react-icons/md';
-import { Datepicker, Select, TextInput } from 'flowbite-react';
+import { Avatar, Datepicker, Dropdown, Select, TextInput, Tooltip } from 'flowbite-react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { RiDeleteBin6Line } from 'react-icons/ri';
+import { RiDeleteBin6Line, RiUserAddLine } from 'react-icons/ri';
 import { FiCheckSquare } from 'react-icons/fi';
 import { HiOutlinePlus } from 'react-icons/hi';
 import { BsXSquare } from 'react-icons/bs';
 import { FaRegEdit } from 'react-icons/fa';
 import CreateSubTaskInput from './CreateSubTaskInput';
 import SubtaskItemCard from './SubtaskItemCard';
+import AssigneeModal from './AssigneeModal';
 import DragHandle from './DragHandle';
 import toast from 'react-hot-toast';
 
 const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTodoDeleteModal }) => {
   const { toggleTodo, updateTodo, setOpenCreateInput, handleOnDragEnd } = useContext(TodoContext);
   const [createSubTaskInput, setCreateSubTaskInput] = useState(false);
+  const [isAssigneeModalOpen, setIsAssigneeModalOpen] = useState(false);
+  const user = JSON.parse(localStorage.getItem('user'));
 
   const handleEditClick = (todo) => {
     setOpenCreateInput(false);
@@ -55,7 +58,7 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTod
   };
 
   return (
-    <div className="flex-1 mb-4 border rounded-md transition-all hover:bg-gray-100 py-3 px-5">
+    <div className="flex-1 mb-4 border rounded-md transition-all hover:bg-gray-50 py-3 px-5">
       <div className="flex flex-col">
         <div className="flex justify-between items-center">
           {todoToEdit._id === todo._id ? (
@@ -175,36 +178,98 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTod
                         : todoDate}{' '}
                       - {convert24HourTo12Hour(todo.time)}
                     </p>
+                    {todo.userId !== user.id && (
+                      <span className="text-sm">- (Created by {todo.createdUser.name})</span>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center items-center gap-4">
-                {todo.status === 'pending' && (
-                  <>
-                    <div
-                      className="flex justify-center items-center gap-2 cursor-pointer me-1.5"
-                      onClick={() => setCreateSubTaskInput(true)}
-                    >
-                      <p className="text-blue-500">Add Sub Task</p>
-                      <HiOutlinePlus className="text-xl text-gray-500" />
-                    </div>
-                    <FaRegEdit
-                      onClick={() => handleEditClick(todo)}
-                      className="text-2xl text-gray-500 cursor-pointer"
-                    />
-                  </>
+
+              <div className="flex gap-5">
+                {todo.assignees.length > 0 && (
+                  <Avatar.Group>
+                    {todo.assignees.map((assignee) => (
+                      <Tooltip key={assignee._id} content={assignee.name}>
+                        <Avatar
+                          className="cursor-pointer"
+                          alt="User Profile"
+                          img={
+                            assignee.image &&
+                            `${process.env.REACT_APP_BASE_URL.slice(0, -4)}/uploads/${
+                              assignee.image
+                            }`
+                          }
+                          rounded
+                          stacked
+                        />
+                      </Tooltip>
+                    ))}
+                  </Avatar.Group>
                 )}
-                <RiDeleteBin6Line
-                  onClick={() => {
-                    setTodoToDelete(todo);
-                    setOpenTodoDeleteModal(true);
-                  }}
-                  className="text-2xl text-gray-500 cursor-pointer transition-all hover:text-red-400"
-                />
+
+                <Dropdown
+                  label=""
+                  dismissOnClick={true}
+                  renderTrigger={() => (
+                    <button
+                      type="button"
+                      className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor"
+                        viewBox="0 0 4 15"
+                      >
+                        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                      </svg>
+                    </button>
+                  )}
+                >
+                  {todo.status === 'pending' && (
+                    <>
+                      {todo.userId === user.id && (
+                        <Dropdown.Item
+                          icon={RiUserAddLine}
+                          onClick={() => setIsAssigneeModalOpen(true)}
+                        >
+                          Add Assignee
+                        </Dropdown.Item>
+                      )}
+                      <Dropdown.Item
+                        icon={HiOutlinePlus}
+                        onClick={() => setCreateSubTaskInput(true)}
+                      >
+                        Add Sub Task
+                      </Dropdown.Item>
+                      <Dropdown.Item icon={FaRegEdit} onClick={() => handleEditClick(todo)}>
+                        Edit
+                      </Dropdown.Item>
+                    </>
+                  )}
+                  {todo.userId === user.id && (
+                    <Dropdown.Item
+                      icon={RiDeleteBin6Line}
+                      onClick={() => {
+                        setTodoToDelete(todo);
+                        setOpenTodoDeleteModal(true);
+                      }}
+                    >
+                      Delete
+                    </Dropdown.Item>
+                  )}
+                </Dropdown>
               </div>
             </>
           )}
         </div>
+
+        <AssigneeModal
+          todo={todo}
+          isAssigneeModalOpen={isAssigneeModalOpen}
+          setIsAssigneeModalOpen={setIsAssigneeModalOpen}
+        />
 
         <DragDropContext onDragEnd={(result) => handleOnDragEnd(result, todo)}>
           <Droppable droppableId="subTasks">

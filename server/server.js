@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const todoRoutes = require('./routes/todoRoutes');
 const subTaskRoutes = require('./routes/subTaskRoutes');
-const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const checkAuth = require('./middlewares/checkAuth');
 require('dotenv').config();
@@ -26,7 +26,7 @@ router.use(checkAuth);
 router.use('/todos', todoRoutes);
 router.use('/todos', subTaskRoutes);
 
-app.use('/api/users', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api', router);
 app.use(errorHandler);
 

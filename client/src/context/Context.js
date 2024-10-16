@@ -57,6 +57,18 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
+  const getAllUsers = async () => {
+    try {
+      const response = await makeGetRequest('/users');
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'User fetch failed');
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const addTodo = async (todo) => {
     try {
       const response = await makePostRequest('/todos', todo);
@@ -119,6 +131,18 @@ export const TodoProvider = ({ children }) => {
       if (response.status !== 200) {
         throw new Error(response.data.message || 'Error reordering task');
       }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const assignTodoToUser = async (todoId, selectedUsers) => {
+    try {
+      const response = await makePostRequest(`/todos/${todoId}/assign`, { selectedUsers });
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error assigning user to task');
+      }
+      fetchTodos();
     } catch (error) {
       throw error;
     }
@@ -226,6 +250,8 @@ export const TodoProvider = ({ children }) => {
     reorderTodos,
     reorderSubtask,
     handleOnDragEnd,
+    assignTodoToUser,
+    getAllUsers,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;

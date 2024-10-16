@@ -8,7 +8,8 @@ import TodoItem from './TodoItemCard';
 import SearchBar from './SearchBar';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import DragHandle from './DragHandle';
-import LogoutModal from './Logout';
+import LogoutModal from './LogoutModal';
+import { useNavigate } from 'react-router-dom';
 
 const TodoList = () => {
   const {
@@ -24,10 +25,15 @@ const TodoList = () => {
   const [todoToDelete, setTodoToDelete] = useState({});
   const [openTodoDeleteModal, setOpenTodoDeleteModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user')) || {};
+  const user = JSON.parse(localStorage.getItem('user'));
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTodos();
+    if (localStorage.getItem('token')) {
+      fetchTodos();
+    } else {
+      navigate('/login');
+    }
   }, [selectedPriorities, searchTerm]);
 
   return (
