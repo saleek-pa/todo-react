@@ -1,13 +1,17 @@
+const mongoose = require('mongoose');
 const SubTask = require('../models/subTaskModel');
 const Todo = require('../models/todoModel');
 
 const getAllTodos = async (req, res) => {
   const { priorities, searchTerm } = req.query;
+  const { userId } = req.user;
 
-  let filterConditions = {};
+  let filterConditions = { userId: new mongoose.Types.ObjectId(userId) };
+
   if (priorities) {
     filterConditions.priority = { $in: priorities.split(',').map(Number) };
   }
+
   if (searchTerm) {
     filterConditions.$or = [
       {
@@ -25,6 +29,9 @@ const getAllTodos = async (req, res) => {
 
   const [result] = await Todo.aggregate([
     {
+      $match: filterConditions,
+    },
+    {
       $lookup: {
         from: 'subtasks',
         localField: 'subTasks',
@@ -41,9 +48,6 @@ const getAllTodos = async (req, res) => {
           },
         },
       },
-    },
-    {
-      $match: filterConditions,
     },
     {
       $sort: { order: 1 },
@@ -65,6 +69,7 @@ const getAllTodos = async (req, res) => {
 
 const createTodo = async (req, res) => {
   const todoData = req.body;
+  const { userId } = req.user;
 
   const minOrderTodo = await Todo.findOne().sort({ order: 1 });
   const newOrder = minOrderTodo ? minOrderTodo.order - 1 : 1;
@@ -72,6 +77,7 @@ const createTodo = async (req, res) => {
   const newTodo = await Todo.create({
     ...todoData,
     order: newOrder,
+    userId,
   });
 
   return res.status(201).json({

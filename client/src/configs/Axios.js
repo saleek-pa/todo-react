@@ -7,12 +7,33 @@ const Axios = AXIOS.create({
   },
 });
 
+Axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 const makeApiRequest = async (method, url, data = {}) => {
   try {
-    const response = await Axios({ method, url, data });
+    const isFormData = data instanceof FormData;
+    const response = await Axios({
+      method,
+      url,
+      data,
+      headers: {
+        'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
+      },
+    });
     return response;
-  } catch (err) {
-    return err;
+  } catch (error) {
+    return error.response;
   }
 };
 

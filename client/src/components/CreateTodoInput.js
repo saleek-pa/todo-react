@@ -18,15 +18,19 @@ const CreateTodoInput = () => {
   const { addTodo, setOpenCreateInput } = useContext(TodoContext);
   const [formData, setFormData] = useState(initialData);
 
-  const handleAddTodo = (e) => {
-    e.preventDefault();
-    if (formData.title.trim()) {
-      addTodo(formData);
-      setFormData(initialData);
-      setOpenCreateInput(false);
-      toast.success('Task added successfully.');
-    } else {
-      toast.error('Title is empty.');
+  const handleAddTodo = async (e) => {
+    try {
+      e.preventDefault();
+      if (formData.title.trim()) {
+        await addTodo(formData);
+        setFormData(initialData);
+        setOpenCreateInput(false);
+        toast.success('Task added successfully.');
+      } else {
+        toast.error('Title is empty.');
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
   return (

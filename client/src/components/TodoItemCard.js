@@ -26,10 +26,14 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTod
     setTodoToEdit(todo);
   };
 
-  const handleUpdateTodo = (todoId) => {
-    updateTodo(todoId, todoToEdit);
-    setTodoToEdit({});
-    toast.success('Task updated successfully.');
+  const handleUpdateTodo = async (todoId) => {
+    try {
+      await updateTodo(todoId, todoToEdit);
+      setTodoToEdit({});
+      toast.success('Task updated successfully.');
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const todoDate = new Date(todo.date).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });

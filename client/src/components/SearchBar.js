@@ -3,11 +3,10 @@ import { TodoContext } from '../context/Context';
 import { IoIosSearch } from 'react-icons/io';
 
 const SearchBar = () => {
-  const { searchTerm, setSearchTerm, refetchTodos } = useContext(TodoContext);
+  const { searchTerm, setSearchTerm } = useContext(TodoContext);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    refetchTodos();
   };
 
   return (

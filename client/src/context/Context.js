@@ -1,7 +1,7 @@
 import { createContext, useState } from 'react';
-import useFetch from '../hooks/useFetch';
 import {
   makeDeleteRequest,
+  makeGetRequest,
   makePatchRequest,
   makePostRequest,
   makePutRequest,
@@ -13,55 +13,95 @@ export const TodoProvider = ({ children }) => {
   const [openCreateInput, setOpenCreateInput] = useState(false);
   const [selectedPriorities, setSelectedPriorities] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isRefetch, setIsRefetch] = useState(false);
+  const [todos, setTodos] = useState({});
 
-  const { data: todos, error } = useFetch(
-    `/todos?priorities=${
-      selectedPriorities.length > 0 ? selectedPriorities.join(',') : ''
-    }&searchTerm=${searchTerm || ''}`,
-    isRefetch
-  );
-  if (error) {
-    console.error('Error fetching todos:', error);
-  }
+  const fetchTodos = async () => {
+    try {
+      const response = await makeGetRequest(
+        `/todos?priorities=${
+          selectedPriorities.length > 0 ? selectedPriorities.join(',') : ''
+        }&searchTerm=${searchTerm || ''}`
+      );
+      if (response?.status !== 200) {
+        throw new Error(response.data.message || 'Failed to fetch todos');
+      }
+      setTodos(response.data.data);
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  const refetchTodos = () => {
-    setIsRefetch((prev) => !prev);
+  const register = async (formData) => {
+    try {
+      const response = await makePostRequest('/users/register', formData);
+      if (response.status !== 201) {
+        throw new Error(response.data.message || 'Registration failed');
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const login = async (email, password) => {
+    try {
+      const response = await makePostRequest('/users/login', { email, password });
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Login failed');
+      }
+      localStorage.setItem('token', response.data.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+      return response;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const addTodo = async (todo) => {
     try {
-      await makePostRequest('/todos', todo);
-      refetchTodos();
+      const response = await makePostRequest('/todos', todo);
+      if (response.status !== 201) {
+        throw new Error(response.data.message || 'Error adding task');
+      }
+      fetchTodos();
     } catch (error) {
-      console.error('Error adding task:', error);
+      throw error;
     }
   };
 
   const updateTodo = async (todoId, updatedTodo) => {
     try {
-      await makePutRequest(`/todos/${todoId}`, updatedTodo);
-      refetchTodos();
+      const response = await makePutRequest(`/todos/${todoId}`, updatedTodo);
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error updating task');
+      }
+      fetchTodos();
     } catch (error) {
-      console.error('Error updating task:', error);
+      throw error;
     }
   };
 
   const toggleTodo = async (todoId) => {
     try {
-      await makePatchRequest(`/todos/${todoId}`);
-      refetchTodos();
+      const response = await makePatchRequest(`/todos/${todoId}`);
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error toggling task');
+      }
+      fetchTodos();
     } catch (error) {
-      console.error('Error updating task:', error);
+      throw error;
     }
   };
 
   const deleteTodo = async (todoId) => {
     try {
-      await makeDeleteRequest(`/todos/${todoId}`);
-      refetchTodos();
+      const response = await makeDeleteRequest(`/todos/${todoId}`);
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error deleting task');
+      }
+      fetchTodos();
     } catch (error) {
-      console.error('Error deleting task:', error);
+      throw error;
     }
   };
 
@@ -75,45 +115,60 @@ export const TodoProvider = ({ children }) => {
         _id: todo._id,
         order: index + 1,
       }));
-      await makePutRequest(`/todos/reorder`, { reorderedTodos });
+      const response = await makePutRequest(`/todos/reorder`, { reorderedTodos });
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error reordering task');
+      }
     } catch (error) {
-      console.error('Error reordering task:', error);
+      throw error;
     }
   };
 
   const addSubTask = async (todoId, title) => {
     try {
-      await makePostRequest(`/todos/${todoId}/subtasks`, { title });
-      refetchTodos();
+      const response = await makePostRequest(`/todos/${todoId}/subtasks`, { title });
+      if (response.status !== 201) {
+        throw new Error(response.data.message || 'Error adding subtask');
+      }
+      fetchTodos();
     } catch (error) {
-      console.error('Error adding task:', error);
+      throw error;
     }
   };
 
   const updateSubTask = async (todoId, subTaskId, title) => {
     try {
-      await makePutRequest(`/todos/${todoId}/subtasks/${subTaskId}`, { title });
-      refetchTodos();
+      const response = await makePutRequest(`/todos/${todoId}/subtasks/${subTaskId}`, { title });
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error updating subtask');
+      }
+      fetchTodos();
     } catch (error) {
-      console.error('Error adding task:', error);
+      throw error;
     }
   };
 
   const toggleSubtask = async (todoId, subTaskId) => {
     try {
-      await makePatchRequest(`/todos/${todoId}/subtasks/${subTaskId}`);
-      refetchTodos();
+      const response = await makePatchRequest(`/todos/${todoId}/subtasks/${subTaskId}`);
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error toggling subtask');
+      }
+      fetchTodos();
     } catch (error) {
-      console.error('Error updating task:', error);
+      throw error;
     }
   };
 
   const deleteSubtask = async (todoId, subTaskId) => {
     try {
-      await makeDeleteRequest(`/todos/${todoId}/subtasks/${subTaskId}`);
-      refetchTodos();
+      const response = await makeDeleteRequest(`/todos/${todoId}/subtasks/${subTaskId}`);
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error deleting subtask');
+      }
+      fetchTodos();
     } catch (error) {
-      console.error('Error deleting task:', error);
+      throw error;
     }
   };
 
@@ -126,9 +181,14 @@ export const TodoProvider = ({ children }) => {
         _id: subTask._id,
         order: index + 1,
       }));
-      await makePutRequest(`/todos/${todo._id}/subtasks/reorder`, { reorderedSubtasks });
+      const response = await makePutRequest(`/todos/${todo._id}/subtasks/reorder`, {
+        reorderedSubtasks,
+      });
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Error reordering subtask');
+      }
     } catch (error) {
-      console.error('Error reordering task:', error);
+      throw error;
     }
   };
 
@@ -144,12 +204,15 @@ export const TodoProvider = ({ children }) => {
   };
 
   const value = {
+    login,
+    register,
+    fetchTodos,
     todos,
+    setTodos,
     addTodo,
     updateTodo,
     toggleTodo,
     deleteTodo,
-    refetchTodos,
     selectedPriorities,
     setSelectedPriorities,
     searchTerm,

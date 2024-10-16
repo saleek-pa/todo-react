@@ -7,14 +7,18 @@ import toast from 'react-hot-toast';
 export function DeleteModal({ todoId, todoToDelete, subtaskToDelete, openModal, setOpenModal }) {
   const { deleteTodo, deleteSubtask } = useContext(TodoContext);
 
-  const handleDelete = () => {
-    if (todoToDelete) {
-      deleteTodo(todoToDelete._id);
-    } else {
-      deleteSubtask(todoId, subtaskToDelete._id);
+  const handleDelete = async () => {
+    try {
+      if (todoToDelete) {
+        await deleteTodo(todoToDelete._id);
+      } else {
+        await deleteSubtask(todoId, subtaskToDelete._id);
+      }
+      toast.success(`${todoToDelete ? 'Task' : 'Subtask'} deleted successfully.`);
+      setOpenModal(false);
+    } catch (error) {
+      toast.error(error.message);
     }
-    toast.error(`${todoToDelete ? 'Task' : 'Subtask'} deleted successfully.`);
-    setOpenModal(false);
   };
 
   return (

@@ -13,7 +13,7 @@ const addSubtask = async (req, res) => {
     });
   }
 
-  const currentSubTasksCount = todo.subTasks.length;
+  const currentSubTasksCount = todo.subTasks?.length;
   const newOrder = currentSubTasksCount + 1;
 
   const newSubTask = await SubTask.create({ title, order: newOrder });

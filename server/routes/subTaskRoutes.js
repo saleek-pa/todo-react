@@ -9,10 +9,11 @@ const {
 } = require('../controllers/subTaskController');
 const router = express.Router();
 
-router.post('/todos/:todoId/subtasks', tryCatch(addSubtask));
-router.put('/todos/:todoId/subtasks/reorder', tryCatch(reorderSubtask));
-router.put('/todos/:todoId/subtasks/:subtaskId', tryCatch(updateSubTask));
-router.patch('/todos/:todoId/subtasks/:subtaskId', tryCatch(toggleSubtask));
-router.delete('/todos/:todoId/subtasks/:subtaskId', tryCatch(deleteSubtask));
+router
+  .post('/:todoId/subtasks', tryCatch(addSubtask))
+  .put('/:todoId/subtasks/reorder', tryCatch(reorderSubtask))
+  .put('/:todoId/subtasks/:subtaskId', tryCatch(updateSubTask))
+  .patch('/:todoId/subtasks/:subtaskId', tryCatch(toggleSubtask))
+  .delete('/:todoId/subtasks/:subtaskId', tryCatch(deleteSubtask));
 
 module.exports = router;

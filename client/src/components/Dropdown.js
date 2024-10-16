@@ -4,7 +4,7 @@ import { RiArrowDropDownLine } from 'react-icons/ri';
 import { TodoContext } from '../context/Context';
 
 const CustomDropdown = () => {
-  const { selectedPriorities, setSelectedPriorities, refetchTodos } = useContext(TodoContext);
+  const { selectedPriorities, setSelectedPriorities } = useContext(TodoContext);
   const [isOpen, setIsOpen] = useState(false);
 
   const options = [
@@ -19,7 +19,6 @@ const CustomDropdown = () => {
       : [...selectedPriorities, value];
 
     setSelectedPriorities(updatedSelection);
-    refetchTodos();
   };
 
   return (
