@@ -1,13 +1,13 @@
-import React, { useContext, useState } from 'react';
-import { TodoContext } from '../context/Context';
+import React, { useContext, useEffect, useState } from 'react';
 import { MdOutlineCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
 import { Dropdown, TextInput } from 'flowbite-react';
-import { FiCheckSquare } from 'react-icons/fi';
-import { BsXSquare } from 'react-icons/bs';
-import toast from 'react-hot-toast';
-import { FaRegEdit } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { FiCheckSquare } from 'react-icons/fi';
+import { TodoContext } from '../context/Context';
 import { DeleteModal } from './DeleteModal';
+import { BsXSquare } from 'react-icons/bs';
+import { FaRegEdit } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const SubtaskItemCard = ({ subTask, todoId, setCreateSubTaskInput }) => {
   const { toggleSubtask, updateSubTask, setOpenCreateInput } = useContext(TodoContext);
@@ -16,31 +16,40 @@ const SubtaskItemCard = ({ subTask, todoId, setCreateSubTaskInput }) => {
   const [subtaskToDelete, setSubtaskToDelete] = useState({});
   const [openSubtaskDeleteModal, setOpenSubtaskDeleteModal] = useState(false);
 
+  useEffect(() => {
+    if (subTaskToEdit) {
+      setSubTaskTitle(subTaskToEdit.title || '');
+    }
+  }, [subTaskToEdit]);
+
   return (
     <div className="flex flex-1 justify-between px-5 border rounded-md py-2 mt-3">
       {subTaskToEdit._id === subTask._id ? (
         <>
-          <div className="flex flex-1 items-center justify-between py-3 gap-16">
+          <form
+            onSubmit={() => {
+              updateSubTask(todoId, subTask._id, subTaskTitle);
+              setSubTaskToEdit({});
+              toast.success('Sub task updated');
+            }}
+            className="flex flex-1 items-center justify-between py-3 gap-16"
+          >
             <div className="flex flex-1 items-center justify-center gap-4">
               <MdOutlineCheckBoxOutlineBlank className="text-2xl cursor-pointer text-gray-500" />
               <TextInput
                 autoFocus
                 placeholder="Title"
                 className="text-xxl flex-1"
-                defaultValue={subTaskToEdit.title}
+                value={subTaskTitle}
                 onChange={(e) => setSubTaskTitle(e.target.value.trimStart())}
                 required
               />
             </div>
             <div className="flex gap-2">
               <div className="flex gap-4">
-                <FiCheckSquare
-                  onClick={() => {
-                    updateSubTask(todoId, subTask._id, subTaskTitle);
-                    setSubTaskToEdit({});
-                  }}
-                  className="text-2xl text-gray-500 cursor-pointer"
-                />
+                <button type="submit">
+                  <FiCheckSquare className="text-2xl text-gray-500 cursor-pointer" />
+                </button>
                 <BsXSquare
                   onClick={() => {
                     setCreateSubTaskInput(false);
@@ -51,7 +60,7 @@ const SubtaskItemCard = ({ subTask, todoId, setCreateSubTaskInput }) => {
                 />
               </div>
             </div>
-          </div>
+          </form>
         </>
       ) : (
         <>

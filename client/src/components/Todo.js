@@ -10,9 +10,11 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import DragHandle from './DragHandle';
 import LogoutModal from './LogoutModal';
 import { useNavigate } from 'react-router-dom';
+import EditProfileModal from './EditProfileModal';
 
 const TodoList = () => {
   const {
+    user,
     todos,
     selectedPriorities,
     openCreateInput,
@@ -25,7 +27,7 @@ const TodoList = () => {
   const [todoToDelete, setTodoToDelete] = useState({});
   const [openTodoDeleteModal, setOpenTodoDeleteModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user'));
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,12 +70,14 @@ const TodoList = () => {
             <span className="block text-sm">{user.name}</span>
             <span className="block truncate text-sm font-medium">{user.email}</span>
           </Dropdown.Header>
-          {/* <Dropdown.Divider /> */}
+          <Dropdown.Item onClick={() => setShowEditProfileModal(true)}>Edit Profile</Dropdown.Item>
           <Dropdown.Item onClick={() => setShowLogoutModal(true)} className="text-red-600">
             Log Out
           </Dropdown.Item>
         </Dropdown>
       </div>
+
+      <EditProfileModal show={showEditProfileModal} setShow={setShowEditProfileModal} />
 
       <LogoutModal showLogoutModal={showLogoutModal} setShowLogoutModal={setShowLogoutModal} />
 

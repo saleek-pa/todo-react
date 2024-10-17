@@ -37,8 +37,6 @@ const Register = () => {
     }
   };
 
-
-
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -61,7 +59,7 @@ const Register = () => {
               <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 Upload image
               </label>
-              <label className="flex flex-col items-center justify-center px-5 h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+              <label className="flex flex-col items-center justify-center px-5 h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   {!preview ? (
                     <>
@@ -88,7 +86,7 @@ const Register = () => {
                       </p>
                     </>
                   ) : (
-                    <img src={preview} alt="Selected" className="object-cover h-full" />
+                    <img src={preview} alt="Selected" className="object-cover w-1/2" />
                   )}
                 </div>
                 <input type="file" className="hidden" name="image" onChange={handleImageChange} />

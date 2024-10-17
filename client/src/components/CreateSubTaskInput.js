@@ -21,7 +21,7 @@ const CreateSubTaskInput = ({ setCreateSubTaskInput, todoId }) => {
   };
 
   return (
-    <div className="mt-4">
+    <form className="mt-4" onSubmit={handleCreateSubTask}>
       <div className="flex items-center justify-between border rounded-md py-3 px-5 gap-16 bg-white">
         <div className="flex flex-1 items-center justify-center gap-4">
           <MdOutlineCheckBoxOutlineBlank className="text-2xl cursor-pointer text-gray-500" />
@@ -36,10 +36,9 @@ const CreateSubTaskInput = ({ setCreateSubTaskInput, todoId }) => {
         </div>
         <div className="flex gap-2">
           <div className="flex gap-4">
-            <FiCheckSquare
-              onClick={handleCreateSubTask}
-              className="text-2xl text-gray-500 cursor-pointer"
-            />
+            <button type="submit">
+              <FiCheckSquare className="text-2xl text-gray-500 cursor-pointer" />
+            </button>
             <BsXSquare
               onClick={() => {
                 setCreateSubTaskInput(false);
@@ -51,7 +50,7 @@ const CreateSubTaskInput = ({ setCreateSubTaskInput, todoId }) => {
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 };
 

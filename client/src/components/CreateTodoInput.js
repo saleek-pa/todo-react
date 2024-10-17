@@ -21,20 +21,17 @@ const CreateTodoInput = () => {
   const handleAddTodo = async (e) => {
     try {
       e.preventDefault();
-      if (formData.title.trim()) {
-        await addTodo(formData);
-        setFormData(initialData);
-        setOpenCreateInput(false);
-        toast.success('Task added successfully.');
-      } else {
-        toast.error('Title is empty.');
-      }
+
+      await addTodo(formData);
+      setFormData(initialData);
+      setOpenCreateInput(false);
+      toast.success('Task added successfully.');
     } catch (error) {
       toast.error(error.message);
     }
   };
   return (
-    <div className="mb-4">
+    <form className="mb-4" onSubmit={handleAddTodo}>
       <div className="flex items-center justify-between border rounded-md py-3 px-5">
         <div className="flex items-center gap-4">
           <MdOutlineCheckBoxOutlineBlank className="text-2xl cursor-pointer text-gray-500" />
@@ -76,10 +73,9 @@ const CreateTodoInput = () => {
         </div>
         <div className="flex gap-2">
           <div className="flex gap-4">
-            <FiCheckSquare
-              onClick={(e) => handleAddTodo(e)}
-              className="text-2xl text-gray-500 cursor-pointer"
-            />
+            <button type="submit">
+              <FiCheckSquare className="text-2xl text-gray-500 cursor-pointer" />
+            </button>
             <BsXSquare
               onClick={() => {
                 setFormData(initialData);
@@ -90,7 +86,7 @@ const CreateTodoInput = () => {
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 };
 

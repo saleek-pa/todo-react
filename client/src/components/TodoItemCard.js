@@ -19,10 +19,10 @@ import DragHandle from './DragHandle';
 import toast from 'react-hot-toast';
 
 const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTodoDeleteModal }) => {
-  const { toggleTodo, updateTodo, setOpenCreateInput, handleOnDragEnd } = useContext(TodoContext);
+  const { user, toggleTodo, updateTodo, setOpenCreateInput, handleOnDragEnd } =
+    useContext(TodoContext);
   const [createSubTaskInput, setCreateSubTaskInput] = useState(false);
   const [isAssigneeModalOpen, setIsAssigneeModalOpen] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user'));
 
   const handleEditClick = (todo) => {
     setOpenCreateInput(false);
@@ -178,7 +178,7 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTod
                         : todoDate}{' '}
                       - {convert24HourTo12Hour(todo.time)}
                     </p>
-                    {todo.userId !== user.id && (
+                    {todo.userId !== user?._id && (
                       <span className="text-sm">- (Created by {todo.createdUser.name})</span>
                     )}
                   </div>
@@ -229,7 +229,7 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTod
                 >
                   {todo.status === 'pending' && (
                     <>
-                      {todo.userId === user.id && (
+                      {todo.userId === user?._id && (
                         <Dropdown.Item
                           icon={RiUserAddLine}
                           onClick={() => setIsAssigneeModalOpen(true)}
@@ -248,7 +248,7 @@ const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTod
                       </Dropdown.Item>
                     </>
                   )}
-                  {todo.userId === user.id && (
+                  {todo.userId === user?._id && (
                     <Dropdown.Item
                       icon={RiDeleteBin6Line}
                       onClick={() => {

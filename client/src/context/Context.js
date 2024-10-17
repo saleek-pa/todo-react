@@ -14,6 +14,7 @@ export const TodoProvider = ({ children }) => {
   const [selectedPriorities, setSelectedPriorities] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [todos, setTodos] = useState({});
+  const [user, setUser] = useState({});
 
   const fetchTodos = async () => {
     try {
@@ -25,7 +26,12 @@ export const TodoProvider = ({ children }) => {
       if (response?.status !== 200) {
         throw new Error(response.data.message || 'Failed to fetch todos');
       }
-      setTodos(response.data.data);
+      setTodos(response?.data?.data);
+      const userResponse = await getUserProfile();
+      if (userResponse?.status !== 200) {
+        throw new Error(response.data.message || 'Failed to fetch user details');
+      }
+      setUser(userResponse?.data?.data);
     } catch (error) {
       throw error;
     }
@@ -49,8 +55,7 @@ export const TodoProvider = ({ children }) => {
       if (response.status !== 200) {
         throw new Error(response.data.message || 'Login failed');
       }
-      localStorage.setItem('token', response.data.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+      localStorage.setItem('token', response.data.data);
       return response;
     } catch (error) {
       throw error;
@@ -63,6 +68,31 @@ export const TodoProvider = ({ children }) => {
       if (response.status !== 200) {
         throw new Error(response.data.message || 'User fetch failed');
       }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const getUserProfile = async (userId) => {
+    try {
+      const response = await makeGetRequest(`/users/${userId}`);
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'User fetch failed');
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const updateUserProfile = async (userId, updatedData) => {
+    try {
+      const response = await makePutRequest(`/users/${userId}`, updatedData);
+      if (response.status !== 200) {
+        throw new Error(response.data.message || 'Update profile failed');
+      }
+      fetchTodos();
       return response;
     } catch (error) {
       throw error;
@@ -151,6 +181,7 @@ export const TodoProvider = ({ children }) => {
   const addSubTask = async (todoId, title) => {
     try {
       const response = await makePostRequest(`/todos/${todoId}/subtasks`, { title });
+      console.log(response);
       if (response.status !== 201) {
         throw new Error(response.data.message || 'Error adding subtask');
       }
@@ -230,6 +261,7 @@ export const TodoProvider = ({ children }) => {
   const value = {
     login,
     register,
+    user,
     fetchTodos,
     todos,
     setTodos,
@@ -252,6 +284,8 @@ export const TodoProvider = ({ children }) => {
     handleOnDragEnd,
     assignTodoToUser,
     getAllUsers,
+    updateUserProfile,
+    getUserProfile,
   };
 
   return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
