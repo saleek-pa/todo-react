@@ -4,9 +4,9 @@ import { Dropdown, TextInput } from 'flowbite-react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FiCheckSquare } from 'react-icons/fi';
 import { TodoContext } from '../context/Context';
-import { DeleteModal } from './DeleteModal';
 import { BsXSquare } from 'react-icons/bs';
 import { FaRegEdit } from 'react-icons/fa';
+import DeleteModal from './DeleteModal';
 import toast from 'react-hot-toast';
 
 const SubtaskItemCard = ({ subTask, todoId, setCreateSubTaskInput }) => {
@@ -124,19 +124,6 @@ const SubtaskItemCard = ({ subTask, todoId, setCreateSubTaskInput }) => {
                 Delete
               </Dropdown.Item>
             </Dropdown>
-            {/* {!subTask.completed && (
-              <FaRegEdit
-                onClick={() => setSubTaskToEdit(subTask)}
-                className="text-2xl text-gray-500 cursor-pointer"
-              />
-            )}
-            <RiDeleteBin6Line
-              onClick={() => {
-                setSubtaskToDelete(subTask);
-                setOpenSubtaskDeleteModal(true);
-              }}
-              className="text-2xl text-gray-500 cursor-pointer transition-all hover:text-red-400"
-            /> */}
           </div>
         </>
       )}

@@ -17,10 +17,12 @@ const initialData = {
 const CreateTodoInput = () => {
   const { addTodo, setOpenCreateInput } = useContext(TodoContext);
   const [formData, setFormData] = useState(initialData);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddTodo = async (e) => {
     try {
       e.preventDefault();
+      setIsLoading(true);
 
       await addTodo(formData);
       setFormData(initialData);
@@ -28,8 +30,11 @@ const CreateTodoInput = () => {
       toast.success('Task added successfully.');
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <form className="mb-4" onSubmit={handleAddTodo}>
       <div className="flex items-center justify-between border rounded-md py-3 px-5">
@@ -72,10 +77,14 @@ const CreateTodoInput = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <div className="flex gap-4">
-            <button type="submit">
-              <FiCheckSquare className="text-2xl text-gray-500 cursor-pointer" />
-            </button>
+          <div className="flex justify-center items-center gap-4">
+            {isLoading ? (
+              <div className="w-7 h-7 border-4 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+            ) : (
+              <button type="submit">
+                <FiCheckSquare className="text-2xl text-gray-500 cursor-pointer" />
+              </button>
+            )}
             <BsXSquare
               onClick={() => {
                 setFormData(initialData);

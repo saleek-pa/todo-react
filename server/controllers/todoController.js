@@ -7,12 +7,7 @@ const getAllTodos = async (req, res) => {
   const { priorities, searchTerm } = req.query;
   const { userId } = req.user;
 
-  let filterConditions = {
-    $or: [
-      { userId: new mongoose.Types.ObjectId(userId) },
-      { assigneeIds: new mongoose.Types.ObjectId(userId) },
-    ],
-  };
+  let filterConditions = {};
 
   if (priorities) {
     filterConditions.priority = { $in: priorities.split(',').map(Number) };
@@ -33,9 +28,9 @@ const getAllTodos = async (req, res) => {
     ];
   }
 
-  const [result] = await Todo.aggregate([
+  const getTodosPipeline = (extraMatch) => [
     {
-      $match: filterConditions,
+      $match: { ...filterConditions, ...extraMatch },
     },
     {
       $lookup: {
@@ -101,12 +96,23 @@ const getAllTodos = async (req, res) => {
         completedTodos: [{ $match: { status: 'completed' } }],
       },
     },
-  ]);
+  ];
+
+  const [createdTodos] = await Todo.aggregate(
+    getTodosPipeline({ userId: new mongoose.Types.ObjectId(`${userId}`) })
+  );
+
+  const [assignedTodos] = await Todo.aggregate(
+    getTodosPipeline({ assigneeIds: new mongoose.Types.ObjectId(`${userId}`) })
+  );
 
   return res.status(200).json({
     status: 'success',
     message: 'Todos retrieved successfully',
-    data: result,
+    data: {
+      createdTodos,
+      assignedTodos,
+    },
   });
 };
 

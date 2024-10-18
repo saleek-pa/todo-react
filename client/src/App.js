@@ -1,10 +1,10 @@
-import Todo from './components/Todo';
-import { TodoProvider } from './context/Context';
-import { Toaster } from 'react-hot-toast';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './components/Login';
+import { TodoProvider } from './context/Context';
+import TodoHome from './components/TodoHome';
 import Register from './components/Register';
+import Login from './components/Login';
 import NotFound from './components/NotFound';
+import { Toaster } from 'react-hot-toast';
 import './App.css';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
       <Router>
         <Toaster position="bottom-right" reverseOrder={false} />
         <Routes>
-          <Route path="/" element={<Todo />} />
+          <Route path="/" element={<TodoHome />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<NotFound />} />

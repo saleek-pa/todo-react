@@ -3,7 +3,7 @@ import { ImCheckboxChecked, ImCheckboxUnchecked } from 'react-icons/im';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { TodoContext } from '../context/Context';
 
-const CustomDropdown = () => {
+const FilterDropdown = () => {
   const { selectedPriorities, setSelectedPriorities } = useContext(TodoContext);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -57,4 +57,4 @@ const CustomDropdown = () => {
   );
 };
 
-export default CustomDropdown;
+export default FilterDropdown;

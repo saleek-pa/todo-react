@@ -147,12 +147,12 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
-  const reorderTodos = async (source, destination) => {
+  const reorderTodos = async (type, source, destination) => {
     try {
-      const [removed] = todos.pendingTodos.splice(source.index, 1);
-      todos.pendingTodos.splice(destination.index, 0, removed);
+      const [removed] = todos[type]?.pendingTodos.splice(source.index, 1);
+      todos[type]?.pendingTodos.splice(destination.index, 0, removed);
 
-      const updatedTodos = todos.pendingTodos.concat(todos.completedTodos);
+      const updatedTodos = todos[type]?.pendingTodos.concat(todos[type]?.completedTodos);
       const reorderedTodos = updatedTodos.map((todo, index) => ({
         _id: todo._id,
         order: index + 1,
@@ -181,7 +181,6 @@ export const TodoProvider = ({ children }) => {
   const addSubTask = async (todoId, title) => {
     try {
       const response = await makePostRequest(`/todos/${todoId}/subtasks`, { title });
-      console.log(response);
       if (response.status !== 201) {
         throw new Error(response.data.message || 'Error adding subtask');
       }
@@ -248,10 +247,10 @@ export const TodoProvider = ({ children }) => {
   };
 
   const handleOnDragEnd = (result, todo = {}) => {
-    const { source, destination } = result;
+    const { type, source, destination } = result;
     if (!destination) return;
     if (source.droppableId === 'pendingTodos') {
-      reorderTodos(source, destination);
+      reorderTodos(type, source, destination);
     }
     if (source.droppableId === 'subTasks') {
       reorderSubtask(todo, source, destination);

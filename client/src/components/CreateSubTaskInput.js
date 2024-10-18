@@ -10,8 +10,9 @@ const CreateSubTaskInput = ({ setCreateSubTaskInput, todoId }) => {
   const { setOpenCreateInput, addSubTask } = useContext(TodoContext);
   const [subTaskTitle, setSubTaskTitle] = useState('');
 
-  const handleCreateSubTask = async () => {
+  const handleCreateSubTask = async (e) => {
     try {
+      e.preventDefault();
       await addSubTask(todoId, subTaskTitle);
       setCreateSubTaskInput(false);
       toast.success('Subtask Added.');

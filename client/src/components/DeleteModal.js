@@ -4,7 +4,7 @@ import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { TodoContext } from '../context/Context';
 import toast from 'react-hot-toast';
 
-export function DeleteModal({ todoId, todoToDelete, subtaskToDelete, openModal, setOpenModal }) {
+export default function DeleteModal({ todoId, todoToDelete, subtaskToDelete, openModal, setOpenModal }) {
   const { deleteTodo, deleteSubtask } = useContext(TodoContext);
 
   const handleDelete = async () => {
