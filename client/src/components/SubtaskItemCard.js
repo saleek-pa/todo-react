@@ -2,15 +2,17 @@ import React, { useContext, useEffect, useState } from 'react';
 import { MdOutlineCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
 import { Dropdown, TextInput } from 'flowbite-react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { SubtaskContext } from '../context/SubtaskContext';
 import { FiCheckSquare } from 'react-icons/fi';
-import { TodoContext } from '../context/Context';
+import { TodoContext } from '../context/TodoContext';
 import { BsXSquare } from 'react-icons/bs';
 import { FaRegEdit } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
 import toast from 'react-hot-toast';
 
 const SubtaskItemCard = ({ subTask, todoId, setCreateSubTaskInput }) => {
-  const { toggleSubtask, updateSubTask, setOpenCreateInput } = useContext(TodoContext);
+  const { setOpenCreateInput } = useContext(TodoContext);
+  const { toggleSubtask, updateSubTask } = useContext(SubtaskContext);
   const [subTaskToEdit, setSubTaskToEdit] = useState(false);
   const [subTaskTitle, setSubTaskTitle] = useState('');
   const [subtaskToDelete, setSubtaskToDelete] = useState({});

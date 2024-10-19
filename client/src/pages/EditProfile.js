@@ -1,11 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
-import { Button, Modal } from 'flowbite-react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { Button } from 'flowbite-react';
 import toast from 'react-hot-toast';
 
-const EditProfileModal = ({ show, setShow }) => {
-  const { user, updateUserProfile } = useContext(AuthContext);
+const EditProfile = () => {
+  const navigate = useNavigate();
+  const { getUserProfile, updateUserProfile } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -15,13 +17,13 @@ const EditProfileModal = ({ show, setShow }) => {
   });
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name,
-        email: user.email,
-      });
-    }
-  }, [user]);
+    const fetchUserDetails = async () => {
+      const response = await getUserProfile();
+      setFormData(response?.data?.data);
+    };
+
+    fetchUserDetails();
+  }, []);
 
   const handleSubmit = async (e) => {
     try {
@@ -36,12 +38,12 @@ const EditProfileModal = ({ show, setShow }) => {
         data.append('image', selectedImage);
       }
 
-      await updateUserProfile(user._id, data);
-      setShow(false);
+      await updateUserProfile(formData._id, data);
       toast.success('Profile updated successfully');
       setSelectedImage(null);
       setPreview(null);
       setFormData({});
+      navigate('/');
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -58,9 +60,9 @@ const EditProfileModal = ({ show, setShow }) => {
   };
 
   return (
-    <Modal show={show} onClose={() => setShow(false)}>
-      <Modal.Header>Edit Profile</Modal.Header>
-      <Modal.Body>
+    <div className="flex justify-center items-center h-screen">
+      <div className="w-full max-w-2xl">
+        <h1 className="text-2xl mb-5">Edit Profile</h1>
         <form onSubmit={handleSubmit}>
           <div className="flex justify-between items-center gap-5 mb-5">
             <div className="flex flex-1 w-auto flex-col items-start justify-center">
@@ -95,10 +97,11 @@ const EditProfileModal = ({ show, setShow }) => {
                 <img
                   alt="profile"
                   src={
-                    user?.image &&
-                    `${process.env.REACT_APP_BASE_URL.slice(0, -4)}/uploads/${user.image}`
+                    formData?.image
+                      ? `${process.env.REACT_APP_BASE_URL.slice(0, -4)}/uploads/${formData.image}`
+                      : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
                   }
-                  className="w-1/2 rounded-lg"
+                  className="w-40 h-40 rounded-lg object-cover"
                 />
               </div>
               <div className="mb-5">
@@ -130,7 +133,11 @@ const EditProfileModal = ({ show, setShow }) => {
               </div>
             </div>
           </div>
-          <Modal.Footer>
+
+          <div className="flex gap-3 justify-end">
+            <Button color="gray" onClick={() => navigate('/')}>
+              Cancel
+            </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
                 <div className="w-5 h-5 border-4 mx-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
@@ -138,14 +145,11 @@ const EditProfileModal = ({ show, setShow }) => {
                 'Save'
               )}
             </Button>
-            <Button color="gray" onClick={() => setShow(false)}>
-              Cancel
-            </Button>
-          </Modal.Footer>
+          </div>
         </form>
-      </Modal.Body>
-    </Modal>
+      </div>
+    </div>
   );
 };
 
-export default EditProfileModal;
+export default EditProfile;

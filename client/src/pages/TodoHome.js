@@ -1,27 +1,22 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Avatar, Button, Dropdown, Tabs } from 'flowbite-react';
 import { LuUser2, LuUserCheck } from 'react-icons/lu';
-import { TodoContext } from '../context/Context';
+import { TodoContext } from '../context/TodoContext';
+import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import EditProfileModal from './EditProfileModal';
-import CreateTodoInput from './CreateTodoInput';
-import CustomDropdown from './FilterDropdown';
-import DeleteModal from './DeleteModal';
-import SearchBar from './SearchBar';
-import LogoutModal from './LogoutModal';
-import TodoList from './TodoList';
-import AssignedTodoList from './AssignedTodoList';
+import AssignedTodoList from '../components/AssignedTodoList';
+import EditProfileModal from '../components/EditProfileModal';
+import CreateTodoInput from '../components/CreateTodoInput';
+import CustomDropdown from '../components/FilterDropdown';
+import DeleteModal from '../components/DeleteModal';
+import LogoutModal from '../components/LogoutModal';
+import SearchBar from '../components/SearchBar';
+import TodoList from '../components/TodoList';
 
 const TodoHome = () => {
-  const {
-    user,
-    todos,
-    selectedPriorities,
-    openCreateInput,
-    setOpenCreateInput,
-    fetchTodos,
-    searchTerm,
-  } = useContext(TodoContext);
+  const { user, getUserProfile } = useContext(AuthContext);
+  const { fetchTodos, todos, openCreateInput, setOpenCreateInput, selectedPriorities, searchTerm } =
+    useContext(TodoContext);
   const [todoToDelete, setTodoToDelete] = useState({});
   const [openTodoDeleteModal, setOpenTodoDeleteModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -31,9 +26,11 @@ const TodoHome = () => {
   useEffect(() => {
     if (localStorage.getItem('token')) {
       fetchTodos();
+      getUserProfile();
     } else {
       navigate('/login');
     }
+    // eslint-disable-next-line
   }, [selectedPriorities, searchTerm]);
 
   return (
@@ -43,12 +40,7 @@ const TodoHome = () => {
         <div className="flex items-center gap-2">
           <SearchBar />
           <CustomDropdown />
-          <Button
-            onClick={() => setOpenCreateInput(true)}
-            className="bg-gray-800 text-white hover:bg-gray-700"
-          >
-            Create Task
-          </Button>
+          <Button onClick={() => setOpenCreateInput(true)}>Create Task</Button>
         </div>
 
         <Dropdown
@@ -68,7 +60,7 @@ const TodoHome = () => {
             <span className="block text-sm">{user.name}</span>
             <span className="block truncate text-sm font-medium">{user.email}</span>
           </Dropdown.Header>
-          <Dropdown.Item onClick={() => setShowEditProfileModal(true)}>Edit Profile</Dropdown.Item>
+          <Dropdown.Item onClick={() => navigate('/profile')}>Edit Profile</Dropdown.Item>
           <Dropdown.Item onClick={() => setShowLogoutModal(true)} className="text-red-600">
             Log Out
           </Dropdown.Item>

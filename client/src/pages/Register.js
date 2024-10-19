@@ -1,11 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { TodoContext } from '../context/Context';
+import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Button } from 'flowbite-react';
 import toast from 'react-hot-toast';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register } = useContext(TodoContext);
+  const { register } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: 'ABC',
     email: 'user@gmail.com',
@@ -17,6 +19,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+      setIsLoading(true);
 
       const data = new FormData();
       data.append('name', formData.name);
@@ -27,13 +30,13 @@ const Register = () => {
         data.append('image', selectedImage);
       }
 
-      const response = await register(data);
-      if (response?.status === 201) {
-        navigate('/login');
-        toast.success('Registration successful');
-      }
+      await register(data);
+      navigate('/login');
+      toast.success('Registration successful');
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,7 +89,7 @@ const Register = () => {
                       </p>
                     </>
                   ) : (
-                    <img src={preview} alt="Selected" className="object-cover w-1/2" />
+                    <img src={preview} alt="Selected" className="object-cover rounded-sm w-1/2" />
                   )}
                 </div>
                 <input type="file" className="hidden" name="image" onChange={handleImageChange} />
@@ -137,12 +140,15 @@ const Register = () => {
             </div>
           </div>
           <div>
-            <button
-              type="submit"
-              className="text-white bg-blue-700 transition-all hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Create Account
-            </button>
+            <Button color="blue" type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <div className="w-5 h-5 border-4 mx-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                'Create Account'
+              )}
+            </Button>
 
             <p className="text-center mt-3">
               Already have an account?{' '}

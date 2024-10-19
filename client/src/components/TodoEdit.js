@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   MdAccessTimeFilled,
   MdOutlineCheckBox,
@@ -6,20 +6,24 @@ import {
 } from 'react-icons/md';
 import { Datepicker, Select, TextInput } from 'flowbite-react';
 import { FiCheckSquare } from 'react-icons/fi';
-import { TodoContext } from '../context/Context';
+import { TodoContext } from '../context/TodoContext';
 import { BsXSquare } from 'react-icons/bs';
 import toast from 'react-hot-toast';
 
 const TodoEdit = ({ todo, todoToEdit, setTodoToEdit }) => {
   const { toggleTodo, updateTodo } = useContext(TodoContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleUpdateTodo = async (todoId) => {
     try {
+      setIsLoading(true);
       await updateTodo(todoId, todoToEdit);
       setTodoToEdit({});
       toast.success('Task updated successfully.');
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,11 +78,15 @@ const TodoEdit = ({ todo, todoToEdit, setTodoToEdit }) => {
         </div>
       </div>
       <div className="flex gap-2">
-        <div className="flex gap-4">
-          <FiCheckSquare
-            onClick={() => handleUpdateTodo(todoToEdit._id)}
-            className="text-2xl text-gray-500 cursor-pointer"
-          />
+        <div className="flex items-center gap-4">
+          {isLoading ? (
+            <div className="w-7 h-7 border-4 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+          ) : (
+            <FiCheckSquare
+              onClick={() => handleUpdateTodo(todoToEdit._id)}
+              className="text-2xl text-gray-500 cursor-pointer"
+            />
+          )}
           <BsXSquare
             onClick={() => setTodoToEdit({})}
             className="text-2xl text-gray-500 cursor-pointer"

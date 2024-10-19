@@ -1,13 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { TodoContext } from '../context/Context';
+import { TodoContext } from '../context/TodoContext';
+import { AuthContext } from '../context/AuthContext';
 import { IoIosSearch } from 'react-icons/io';
+import { Button } from 'flowbite-react';
 import toast from 'react-hot-toast';
 
 const AssigneeModal = ({ todo, isAssigneeModalOpen, setIsAssigneeModalOpen }) => {
-  const { getAllUsers, assignTodoToUser } = useContext(TodoContext);
+  const { getAllUsers } = useContext(AuthContext);
+  const { assignTodoToUser } = useContext(TodoContext);
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUsers, setSelectedUsers] = useState(todo?.assigneeIds);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchAllUsers = async () => {
@@ -21,15 +25,19 @@ const AssigneeModal = ({ todo, isAssigneeModalOpen, setIsAssigneeModalOpen }) =>
       }
     };
     fetchAllUsers();
+    // eslint-disable-next-line
   }, [isAssigneeModalOpen]);
 
   const handleAddAssignee = async () => {
     try {
+      setIsLoading(true);
       await assignTodoToUser(todo._id, selectedUsers);
       setIsAssigneeModalOpen(false);
       toast.success('Assignee updated successfully');
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -88,19 +96,18 @@ const AssigneeModal = ({ todo, isAssigneeModalOpen, setIsAssigneeModalOpen }) =>
           ))}
         </ul>
 
-        <div className="flex justify-end mt-5 gap-3">
-          <button
-            className="bg-gray-300 text-black rounded-md px-4 py-2"
-            onClick={() => setIsAssigneeModalOpen(false)}
-          >
+        <div className="flex justify-end items-center mt-5 gap-3">
+          <Button color="gray" onClick={() => setIsAssigneeModalOpen(false)}>
             Cancel
-          </button>
-          <button
-            className="bg-blue-500 text-white rounded-md px-4 py-2"
-            onClick={handleAddAssignee}
-          >
-            Save
-          </button>
+          </Button>
+
+          <Button color="blue" onClick={handleAddAssignee} disabled={isLoading}>
+            {isLoading ? (
+              <div className="w-5 h-5 border-4 mx-3 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+            ) : (
+              'Save'
+            )}
+          </Button>
         </div>
       </div>
     </div>

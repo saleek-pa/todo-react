@@ -1,11 +1,15 @@
 import React, { useContext, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { TodoContext } from '../context/Context';
+import { ReorderContext } from '../context/ReorderContext';
+import { TodoContext } from '../context/TodoContext';
+import { AuthContext } from '../context/AuthContext';
 import DragHandle from './DragHandle';
 import TodoItem from './TodoItemCard';
 
 const AssignedTodoList = ({ setOpenTodoDeleteModal, setTodoToDelete }) => {
-  const { user, todos, selectedPriorities, handleOnDragEnd } = useContext(TodoContext);
+  const { user } = useContext(AuthContext);
+  const { handleOnDragEnd } = useContext(ReorderContext);
+  const { todos, selectedPriorities } = useContext(TodoContext);
   const [todoToEdit, setTodoToEdit] = useState({});
 
   return (

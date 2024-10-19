@@ -1,17 +1,20 @@
 import React, { useContext, useState } from 'react';
-import { TodoContext } from '../context/Context';
+import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Button } from 'flowbite-react';
 import toast from 'react-hot-toast';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useContext(TodoContext);
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('user@gmail.com');
   const [password, setPassword] = useState('1234');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+      setIsLoading(true);
 
       await login(email, password);
       toast.success('Login successful');
@@ -21,6 +24,8 @@ const Login = () => {
       navigate('/');
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,12 +62,15 @@ const Login = () => {
           />
         </div>
 
-        <button
-          type="submit"
-          className="text-white bg-blue-700 transition-all hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        >
-          Login
-        </button>
+        <Button type="submit" color="blue" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <div className="flex justify-center">
+              <div className="w-5 h-5 border-4 mx-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            'Login'
+          )}
+        </Button>
 
         <p className="text-center mt-3">
           Don't have an account?{' '}

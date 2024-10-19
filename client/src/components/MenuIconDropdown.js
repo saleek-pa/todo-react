@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
-import { Dropdown } from 'flowbite-react';
-import { TodoContext } from '../context/Context';
+import { TodoContext } from '../context/TodoContext';
+import { AuthContext } from '../context/AuthContext';
 import { RiDeleteBin6Line, RiUserAddLine } from 'react-icons/ri';
 import { HiOutlinePlus } from 'react-icons/hi';
 import { FaRegEdit } from 'react-icons/fa';
+import { Dropdown } from 'flowbite-react';
 
 const MenuIconDropdown = ({
   todo,
@@ -13,7 +14,8 @@ const MenuIconDropdown = ({
   setCreateSubTaskInput,
   setOpenTodoDeleteModal,
 }) => {
-  const { user, setOpenCreateInput } = useContext(TodoContext);
+  const { user } = useContext(AuthContext);
+  const { setOpenCreateInput } = useContext(TodoContext);
 
   const handleEditClick = (todo) => {
     setOpenCreateInput(false);

@@ -1,23 +1,29 @@
 import React, { useContext, useState } from 'react';
+import { MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
+import { SubtaskContext } from '../context/SubtaskContext';
+import { FiCheckSquare } from 'react-icons/fi';
+import { TodoContext } from '../context/TodoContext';
 import { TextInput } from 'flowbite-react';
 import { BsXSquare } from 'react-icons/bs';
-import { TodoContext } from '../context/Context';
-import { FiCheckSquare } from 'react-icons/fi';
-import { MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
 import toast from 'react-hot-toast';
 
 const CreateSubTaskInput = ({ setCreateSubTaskInput, todoId }) => {
-  const { setOpenCreateInput, addSubTask } = useContext(TodoContext);
+  const { addSubTask } = useContext(SubtaskContext);
+  const { setOpenCreateInput } = useContext(TodoContext);
   const [subTaskTitle, setSubTaskTitle] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateSubTask = async (e) => {
     try {
       e.preventDefault();
+      setIsLoading(true);
       await addSubTask(todoId, subTaskTitle);
       setCreateSubTaskInput(false);
       toast.success('Subtask Added.');
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -36,10 +42,14 @@ const CreateSubTaskInput = ({ setCreateSubTaskInput, todoId }) => {
           />
         </div>
         <div className="flex gap-2">
-          <div className="flex gap-4">
-            <button type="submit">
-              <FiCheckSquare className="text-2xl text-gray-500 cursor-pointer" />
-            </button>
+          <div className="flex items-center gap-4">
+            {isLoading ? (
+              <div className="w-7 h-7 border-4 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+            ) : (
+              <button type="submit">
+                <FiCheckSquare className="text-2xl text-gray-500 cursor-pointer" />
+              </button>
+            )}
             <BsXSquare
               onClick={() => {
                 setCreateSubTaskInput(false);

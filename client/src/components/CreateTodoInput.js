@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
-import { TodoContext } from '../context/Context';
 import { MdAccessTimeFilled, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
 import { Datepicker, Select, TextInput } from 'flowbite-react';
 import { FiCheckSquare } from 'react-icons/fi';
+import { TodoContext } from '../context/TodoContext';
 import { BsXSquare } from 'react-icons/bs';
 import toast from 'react-hot-toast';
 
@@ -36,7 +36,7 @@ const CreateTodoInput = () => {
   };
 
   return (
-    <form className="mb-4" onSubmit={handleAddTodo}>
+    <form className="mb-4 ms-7" onSubmit={handleAddTodo}>
       <div className="flex items-center justify-between border rounded-md py-3 px-5">
         <div className="flex items-center gap-4">
           <MdOutlineCheckBoxOutlineBlank className="text-2xl cursor-pointer text-gray-500" />

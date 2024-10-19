@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { TodoContext } from '../context/Context';
+import { TodoContext } from '../context/TodoContext';
 import { IoIosSearch } from 'react-icons/io';
 
 const SearchBar = () => {
