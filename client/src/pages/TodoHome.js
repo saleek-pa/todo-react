@@ -1,35 +1,45 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Avatar, Button, Dropdown, Tabs } from 'flowbite-react';
+import { useDispatch, useSelector } from 'react-redux';
 import { LuUser2, LuUserCheck } from 'react-icons/lu';
+import { getUserProfile } from '../redux/userSlice';
 import { TodoContext } from '../context/TodoContext';
-import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import AssignedTodoList from '../components/AssignedTodoList';
-import EditProfileModal from '../components/EditProfileModal';
 import CreateTodoInput from '../components/CreateTodoInput';
 import CustomDropdown from '../components/FilterDropdown';
 import DeleteModal from '../components/DeleteModal';
 import LogoutModal from '../components/LogoutModal';
 import SearchBar from '../components/SearchBar';
 import TodoList from '../components/TodoList';
+import toast from 'react-hot-toast';
 
 const TodoHome = () => {
-  const { user, getUserProfile } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
   const { fetchTodos, todos, openCreateInput, setOpenCreateInput, selectedPriorities, searchTerm } =
     useContext(TodoContext);
+
   const [todoToDelete, setTodoToDelete] = useState({});
   const [openTodoDeleteModal, setOpenTodoDeleteModal] = useState(false);
-  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem('token')) {
-      fetchTodos();
-      getUserProfile();
-    } else {
-      navigate('/login');
-    }
+    const fetchData = async () => {
+      try {
+        if (localStorage.getItem('token')) {
+          await fetchTodos();
+          await dispatch(getUserProfile()).unwrap();
+        } else {
+          navigate('/login');
+        }
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+
+    fetchData();
+
     // eslint-disable-next-line
   }, [selectedPriorities, searchTerm]);
 
@@ -67,18 +77,24 @@ const TodoHome = () => {
         </Dropdown>
       </div>
 
-      <EditProfileModal show={showEditProfileModal} setShow={setShowEditProfileModal} />
       <LogoutModal showLogoutModal={showLogoutModal} setShowLogoutModal={setShowLogoutModal} />
 
       <Tabs aria-label="Default tabs" variant="default">
         <Tabs.Item active title="My Tasks" icon={LuUser2}>
           {openCreateInput && <CreateTodoInput />}
+
+          {selectedPriorities?.length > 0 && (
+            <p className="mb-2">Showing Priority {selectedPriorities.sort().join(', ')} Tasks</p>
+          )}
+
           {!todos ||
           (todos?.createdTodos?.pendingTodos?.length === 0 &&
             todos?.createdTodos?.completedTodos?.length === 0) ? (
             <p className="text-center text-gray-500 mt-16 text-2xl">No tasks available.</p>
           ) : (
             <TodoList
+              todos={todos}
+              type={'createdTodos'}
               setTodoToDelete={setTodoToDelete}
               setOpenTodoDeleteModal={setOpenTodoDeleteModal}
             />
@@ -91,7 +107,9 @@ const TodoHome = () => {
             todos?.assignedTodos?.completedTodos?.length === 0) ? (
             <p className="text-center text-gray-500 mt-16 text-2xl">No tasks available.</p>
           ) : (
-            <AssignedTodoList
+            <TodoList
+              todos={todos}
+              type={'assignedTodos'}
               setTodoToDelete={setTodoToDelete}
               setOpenTodoDeleteModal={setOpenTodoDeleteModal}
             />

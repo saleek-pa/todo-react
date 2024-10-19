@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { TodoContext } from '../context/TodoContext';
-import { AuthContext } from '../context/AuthContext';
 import { RiDeleteBin6Line, RiUserAddLine } from 'react-icons/ri';
 import { HiOutlinePlus } from 'react-icons/hi';
+import { useSelector } from 'react-redux';
 import { FaRegEdit } from 'react-icons/fa';
 import { Dropdown } from 'flowbite-react';
 
@@ -14,7 +14,7 @@ const MenuIconDropdown = ({
   setCreateSubTaskInput,
   setOpenTodoDeleteModal,
 }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useSelector((state) => state.user);
   const { setOpenCreateInput } = useContext(TodoContext);
 
   const handleEditClick = (todo) => {

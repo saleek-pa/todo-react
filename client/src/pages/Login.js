@@ -1,31 +1,31 @@
-import React, { useContext, useState } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'flowbite-react';
+import { login } from '../redux/userSlice';
 import toast from 'react-hot-toast';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
-  const [email, setEmail] = useState('user@gmail.com');
-  const [password, setPassword] = useState('1234');
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.user);
+
+  const [formData, setFormData] = useState({
+    email: 'user@gmail.com',
+    password: '1234',
+  });
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      setIsLoading(true);
 
-      await login(email, password);
+      await dispatch(login(formData)).unwrap();
+
       toast.success('Login successful');
-
-      setEmail('');
-      setPassword('');
+      e.target.reset();
       navigate('/');
     } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setIsLoading(false);
+      toast.error(error);
     }
   };
 
@@ -41,8 +41,8 @@ const Login = () => {
           <input
             autoFocus
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="name@email.com"
             required
@@ -54,16 +54,16 @@ const Login = () => {
           </label>
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value.trim())}
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value.trim() })}
             placeholder="********"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             required
           />
         </div>
 
-        <Button type="submit" color="blue" className="w-full" disabled={isLoading}>
-          {isLoading ? (
+        <Button type="submit" color="blue" className="w-full" disabled={loading}>
+          {loading ? (
             <div className="flex justify-center">
               <div className="w-5 h-5 border-4 mx-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
             </div>

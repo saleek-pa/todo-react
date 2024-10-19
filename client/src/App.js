@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
 import { TodoProvider } from './context/TodoContext';
 import { SubtaskProvider } from './context/SubtaskContext';
 import { ReorderProvider } from './context/ReorderContext';
@@ -13,24 +12,22 @@ import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <TodoProvider>
-        <SubtaskProvider>
-          <ReorderProvider>
-            <Router>
-              <Toaster position="bottom-right" reverseOrder={false} />
-              <Routes>
-                <Route path="/" element={<TodoHome />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/profile" element={<EditProfile />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Router>
-          </ReorderProvider>
-        </SubtaskProvider>
-      </TodoProvider>
-    </AuthProvider>
+    <TodoProvider>
+      <SubtaskProvider>
+        <ReorderProvider>
+          <Router>
+            <Toaster position="bottom-right" reverseOrder={false} />
+            <Routes>
+              <Route path="/" element={<TodoHome />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/profile" element={<EditProfile />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Router>
+        </ReorderProvider>
+      </SubtaskProvider>
+    </TodoProvider>
   );
 }
 

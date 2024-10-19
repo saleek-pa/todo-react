@@ -2,8 +2,8 @@ import { useState, useContext } from 'react';
 import { MdOutlineCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { ReorderContext } from '../context/ReorderContext';
-import { AuthContext } from '../context/AuthContext';
 import { TodoContext } from '../context/TodoContext';
+import { useSelector } from 'react-redux';
 import { Avatar } from 'flowbite-react';
 import CreateSubTaskInput from './CreateSubTaskInput';
 import MenuIconDropdown from './MenuIconDropdown';
@@ -14,7 +14,7 @@ import TodoEdit from './TodoEdit';
 import toast from 'react-hot-toast';
 
 const TodoItem = ({ todo, todoToEdit, setTodoToEdit, setTodoToDelete, setOpenTodoDeleteModal }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useSelector((state) => state.user);
   const { toggleTodo } = useContext(TodoContext);
   const { handleOnDragEnd } = useContext(ReorderContext);
   const [createSubTaskInput, setCreateSubTaskInput] = useState(false);

@@ -1,27 +1,28 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { TodoContext } from '../context/TodoContext';
-import { AuthContext } from '../context/AuthContext';
+import { getAllUsers } from '../redux/userSlice';
 import { IoIosSearch } from 'react-icons/io';
+import { useDispatch } from 'react-redux';
 import { Button } from 'flowbite-react';
 import toast from 'react-hot-toast';
 
 const AssigneeModal = ({ todo, isAssigneeModalOpen, setIsAssigneeModalOpen }) => {
-  const { getAllUsers } = useContext(AuthContext);
   const { assignTodoToUser } = useContext(TodoContext);
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUsers, setSelectedUsers] = useState(todo?.assigneeIds);
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
         if (isAssigneeModalOpen) {
-          const response = await getAllUsers();
-          setUsers(response.data.data);
+          const response = await dispatch(getAllUsers()).unwrap();
+          setUsers(response.data);
         }
       } catch (error) {
-        toast.error(error.message);
+        toast.error(error);
       }
     };
     fetchAllUsers();

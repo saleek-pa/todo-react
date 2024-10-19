@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { getUserProfile, updateUserProfile } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'flowbite-react';
 import toast from 'react-hot-toast';
 
 const EditProfile = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { getUserProfile, updateUserProfile } = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(false);
+  const { loading } = useSelector((state) => state.user);
+
   const [preview, setPreview] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [formData, setFormData] = useState({
@@ -18,17 +20,17 @@ const EditProfile = () => {
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      const response = await getUserProfile();
-      setFormData(response?.data?.data);
+      const response = await dispatch(getUserProfile());
+      setFormData(response?.payload?.data);
     };
 
     fetchUserDetails();
+    // eslint-disable-next-line
   }, []);
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      setIsLoading(true);
 
       const data = new FormData();
       data.append('name', formData.name);
@@ -38,7 +40,7 @@ const EditProfile = () => {
         data.append('image', selectedImage);
       }
 
-      await updateUserProfile(formData._id, data);
+      await dispatch(updateUserProfile({ userId: formData._id, updatedData: data }));
       toast.success('Profile updated successfully');
       setSelectedImage(null);
       setPreview(null);
@@ -46,8 +48,6 @@ const EditProfile = () => {
       navigate('/');
     } catch (error) {
       toast.error(error.message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -138,8 +138,8 @@ const EditProfile = () => {
             <Button color="gray" onClick={() => navigate('/')}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
+            <Button type="submit" disabled={loading}>
+              {loading ? (
                 <div className="w-5 h-5 border-4 mx-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
               ) : (
                 'Save'

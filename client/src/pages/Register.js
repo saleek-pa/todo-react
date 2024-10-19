@@ -1,13 +1,15 @@
-import React, { useContext, useState } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../redux/userSlice';
 import { Button } from 'flowbite-react';
 import toast from 'react-hot-toast';
 
 const Register = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { register } = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(false);
+  const { loading } = useSelector((state) => state.user);
+
   const [formData, setFormData] = useState({
     name: 'ABC',
     email: 'user@gmail.com',
@@ -19,7 +21,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      setIsLoading(true);
 
       const data = new FormData();
       data.append('name', formData.name);
@@ -30,13 +31,11 @@ const Register = () => {
         data.append('image', selectedImage);
       }
 
-      await register(data);
-      navigate('/login');
+      await dispatch(register(data)).unwrap();
       toast.success('Registration successful');
+      navigate('/login');
     } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setIsLoading(false);
+      toast.error(error);
     }
   };
 
@@ -140,8 +139,8 @@ const Register = () => {
             </div>
           </div>
           <div>
-            <Button color="blue" type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? (
+            <Button color="blue" type="submit" disabled={loading} className="w-full">
+              {loading ? (
                 <div className="flex justify-center">
                   <div className="w-5 h-5 border-4 mx-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
                 </div>
